@@ -1,0 +1,399 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "movid app",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "HelloWorldIntent",
+          "slots": [],
+          "samples": [
+            "hello",
+            "how are you",
+            "say hi world",
+            "say hi",
+            "hi",
+            "say hello world",
+            "say hello"
+          ]
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "SymptomCheckerIntent",
+          "slots": [
+            {
+              "name": "age",
+              "type": "AMAZON.NUMBER",
+              "samples": [
+                "my age is {age}",
+                "I am {age}",
+                "I am {age} years old"
+              ]
+            },
+            {
+              "name": "gender",
+              "type": "AMAZON.SearchQuery",
+              "samples": [
+                "my gender is {gender}",
+                "{gender}",
+                "I am {gender}"
+              ]
+            },
+            {
+              "name": "lifeThreateningSymptoms",
+              "type": "AMAZON.SearchQuery",
+              "samples": [
+                "{lifeThreateningSymptoms}"
+              ]
+            },
+            {
+              "name": "country",
+              "type": "AMAZON.Country"
+            },
+            {
+              "name": "feelingSick",
+              "type": "AMAZON.SearchQuery",
+              "samples": [
+                "{feelingSick}"
+              ]
+            },
+            {
+              "name": "hasSymptoms",
+              "type": "AMAZON.SearchQuery",
+              "samples": [
+                "{hasSymptoms}"
+              ]
+            },
+            {
+              "name": "lastTwoWeeksPresenceCovidInfected",
+              "type": "AMAZON.SearchQuery",
+              "samples": [
+                "{lastTwoWeeksPresenceCovidInfected}"
+              ]
+            },
+            {
+              "name": "liveInLongTermCareFacility",
+              "type": "AMAZON.SearchQuery",
+              "samples": [
+                "{liveInLongTermCareFacility}"
+              ]
+            },
+            {
+              "name": "lastTwoWeeksHealthCareFacility",
+              "type": "AMAZON.SearchQuery",
+              "samples": [
+                "{lastTwoWeeksHealthCareFacility}"
+              ]
+            },
+            {
+              "name": "hasChronicCondition",
+              "type": "AMAZON.SearchQuery",
+              "samples": [
+                "{hasChronicCondition}"
+              ]
+            }
+          ],
+          "samples": [
+            "check symptoms",
+            "I would like to check symptoms"
+          ]
+        },
+        {
+          "name": "ReportSymptomsIntent",
+          "slots": [],
+          "samples": [
+            "log my symptoms",
+            "send my symptoms to servicenow",
+            "send my symptoms",
+            "symptom report",
+            "start report",
+            "report symptoms",
+            "Id like to report symptoms"
+          ]
+        },
+        {
+          "name": "StateRestrictionsCheckIntent",
+          "slots": [
+            {
+              "name": "state",
+              "type": "AMAZON.US_STATE"
+            }
+          ],
+          "samples": [
+            "state restrictions for {state}",
+            "What are the current Covid state restrictions for  {state} ",
+            "Can you tell me restrictions are in place for {state}"
+          ]
+        },
+        {
+          "name": "StateCovidInformationIntent",
+          "slots": [
+            {
+              "name": "state",
+              "type": "AMAZON.US_STATE"
+            }
+          ],
+          "samples": [
+            "information for {state}",
+            "Can I have information for {state}",
+            "What is the covid situation like in {state}"
+          ]
+        },
+        {
+          "name": "StateInfectionRateIntent",
+          "slots": [
+            {
+              "name": "state",
+              "type": "AMAZON.US_STATE"
+            }
+          ],
+          "samples": [
+            "infection rate for {state}",
+            "what is the infection rate for {state}"
+          ]
+        }
+      ],
+      "types": []
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "SymptomCheckerIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "age",
+              "type": "AMAZON.NUMBER",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.954409026712.168944885308"
+              }
+            },
+            {
+              "name": "gender",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.954409026712.924772379578"
+              }
+            },
+            {
+              "name": "lifeThreateningSymptoms",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.147800406095.625819866160"
+              }
+            },
+            {
+              "name": "country",
+              "type": "AMAZON.Country",
+              "elicitationRequired": false,
+              "confirmationRequired": false,
+              "prompts": {}
+            },
+            {
+              "name": "feelingSick",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.712457866235.509256286527"
+              }
+            },
+            {
+              "name": "hasSymptoms",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.38258974372.495967765030"
+              }
+            },
+            {
+              "name": "lastTwoWeeksPresenceCovidInfected",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.556550683474.511907188049"
+              }
+            },
+            {
+              "name": "liveInLongTermCareFacility",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.147800406095.1389715214579"
+              }
+            },
+            {
+              "name": "lastTwoWeeksHealthCareFacility",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.712457866235.375097500634"
+              }
+            },
+            {
+              "name": "hasChronicCondition",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.712457866235.772994823302"
+              }
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.954409026712.168944885308",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "how old are you?"
+          },
+          {
+            "type": "PlainText",
+            "value": "your age?"
+          },
+          {
+            "type": "PlainText",
+            "value": "what is your age?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.954409026712.924772379578",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "your gender?"
+          },
+          {
+            "type": "PlainText",
+            "value": "are you male or female?"
+          },
+          {
+            "type": "PlainText",
+            "value": "what is your gender?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.954409026712.45958008805",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "what country are you from?"
+          },
+          {
+            "type": "PlainText",
+            "value": "your country?"
+          },
+          {
+            "type": "PlainText",
+            "value": "where are you from?"
+          }
+        ]
+      },
+      {
+        "id": "Confirm.Intent.38258974372",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Confirming that you wish to run the symptom checker?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.38258974372.495967765030",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Do you have any of the following symptoms Fever or feeling feverish such as chills,Cough. Mild or moderate difficulty breathing. Sore throat. Muscle aches or body aches. Vomiting or diarrhea. New loss of taste or smell. Congestion or runny nose. or Other symptoms. "
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.147800406095.625819866160",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Do you have any of these life-threatening symptoms. Bluish lips or face. Severe and constant pain or pressure in the chest. Extreme difficulty breathing such as gasping for air, being unable to talk without catching your breath, severe wheezing, nostrils flaring. New disorientation such as acting confused. "
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.147800406095.1389715214579",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Do you live in a long term care facility,nursing home, or homeless shelter?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.712457866235.509256286527",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Are you feeling sick?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.712457866235.375097500634",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "In the last two weeks, have you worked,volunteered, or been a patient in a healthcare facility or worked as a first responder. Healthcare facilities include a hospital, medical or dental clinic, long term care facility, or nursing home."
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.712457866235.772994823302",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Do any of these conditions apply to you. Chronic lung disease, such as moderate to severe asthma, chronic obstructivepulmonary disease, cystic fibrosis, or pulmonary fibrosis. Serious heart condition, such as heart failure, cardiomyopathy,heart attack, or blocked arteries to the heart. Weakened immune system or taking medications that may cause immune suppression. Obesity. Diabetes, chronic kidney disease, or liver disease. High blood pressure. Cancer. HIV. Blood disorder, such as sickle cell disease or thalassemia. Cerebrovascular disease or neurologic condition, such as stroke or dementia. Smoking or vaping. Pregnancy. Please respond with Yes or No"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.556550683474.511907188049",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "In the two weeks before you felt sick, did you care for or have close contact within six feet of an infected person for at least fifteen minutes with someone with symptoms of COVID nineteen, tested for COVID nineteen, or diagnosed with COVID nineteen?"
+          }
+        ]
+      }
+    ]
+  },
+  "version": "1"
+}

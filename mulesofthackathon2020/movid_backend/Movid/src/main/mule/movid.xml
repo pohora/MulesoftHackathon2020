@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b2c616d3-a80c-452b-ac76-e8a32ea3c887" >
+		<http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS">
+			<tls:context >
+				<tls:key-store type="jks" path="keystore.jks" alias="mule" keyPassword="password" password="password" />
+			</tls:context>
+		</http:listener-connection>
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="1ef8e19f-4085-4392-9cc3-7504cbba8761" >
+		<http:request-connection protocol="HTTPS" host="jsonplaceholder.typicode.com" />
+	</http:request-config>
+	<amqp:config name="AMQP_Config" doc:name="AMQP Config" doc:id="9f0885e0-bd98-49ca-96f9-0d69d7c3363d" >
+		<amqp:connection host="localhost" username="guest" password="guest" />
+	</amqp:config>
+	<http:request-config name="covidactnowConfig" doc:name="HTTP Request configuration" doc:id="81ff8196-3293-499f-b15a-f57cc42bd40a" basePath="/v2/state/">
+		<http:request-connection protocol="HTTPS" host="api.covidactnow.org" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="09f2738a-8520-48b8-9504-26665f12b2eb" >
+		<http:request-connection protocol="HTTPS" host="localcoviddata.com" />
+	</http:request-config>
+	<servicenow:config name="ServiceNow_Config" doc:name="ServiceNow Config" doc:id="54a53f1e-0588-4e0c-8ea4-7e4d09b6a4d7" >
+		<servicenow:basic-connection username="${snow_username}" password="${snow_password}" serviceAddress="https://dev100866.service-now.com" >
+			<servicenow:transport >
+				<servicenow:basic-auth-http-message-dispatcher-provider username="admin" password="POHletmein1*" />
+			</servicenow:transport>
+		</servicenow:basic-connection>
+	</servicenow:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="4dd7a1f2-da7b-4d53-ad5b-2358ee8151c8" file="dev.properties" />
+	<flow name="SymptomCheckerFlow" doc:id="86b44312-5582-44fe-b11a-b5e96ea339d2" >
+		<http:listener doc:name="Listener" doc:id="bf625023-fc17-4eb7-92a6-dcdfecf722e8" config-ref="HTTP_Listener_config" path="/api/symptomchecker"/>
+		<ee:transform doc:name="Transform Message" doc:id="e5fe0789-9001-4878-88e2-41b28df2fa60" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"age":attributes.queryParams.age,
+	"gender":attributes.queryParams.gender,
+	"lifeThreateningSymptoms":attributes.queryParams.lifeThreateningSymptoms,
+	"hasSymptoms":attributes.queryParams.hasSymptoms,
+	"liveInLongTermCareFacility":attributes.queryParams.liveInLongTermCareFacility,
+	"feelingSick":attributes.queryParams.feelingSick,
+	"lastTwoWeeksHealthCareFacility":attributes.queryParams.lastTwoWeeksHealthCareFacility,
+	"hasChronicCondition":attributes.queryParams.hasChronicCondition,
+	"lastTwoWeeksPresenceCovidInfected":attributes.queryParams.lastTwoWeeksPresenceCovidInfected
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<java:invoke-static doc:name="Invoke static" doc:id="174b632d-8d46-4f86-ad98-c68ddeac3ce9" class="movid.ProcessSymptoms" method="processSymptoms(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String)">
+			<java:args ><![CDATA[#[{age:payload.age,gender:payload.gender,lifeThreateningSymptoms:payload.lifeThreateningSymptoms,feelingSick:payload.feelingSick,hasSymptoms:payload.hasSymptoms,liveInLongTermCareFacility:payload.liveInLongTermCareFacility,lastTwoWeeksHealthCareFacility:payload.lastTwoWeeksHealthCareFacility,hasChronicCondition:payload.hasChronicCondition,lastTwoWeeksPresenceCovidInfected:payload.lastTwoWeeksPresenceCovidInfected}]]]></java:args>
+		</java:invoke-static>
+		<ee:transform doc:name="Transform Message" doc:id="e6ecbeca-f57c-41ad-88d1-ec6f3cc41c2f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"output":payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="413da867-91f8-459b-828d-765b890b6849" message="#[payload]"/>
+	</flow>
+	<flow name="StateInformation" doc:id="6c2fb46f-1add-4cc5-92c8-5cbb333e3ff1" >
+		<http:listener doc:name="Listener" doc:id="12ad2bf4-a8cc-4511-9e1f-196c89e96720" config-ref="HTTP_Listener_config" path="/api/stateinformation"/>
+		<set-variable value="#[attributes.queryParams.stateCode]" doc:name="Set Variable" doc:id="7e7094a7-131d-4fee-b2d1-22a2d6869816" variableName="stateCode"/>
+		<http:request method="GET" doc:name="Request" doc:id="fc6c604a-7aff-43ce-9df4-ead607eeca83" path='#[vars.stateCode ++ ".json"]' config-ref="covidactnowConfig">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"apiKey" : "${apiKey}"
+}]]]></http:query-params>
+		</http:request>
+		<java:invoke-static method="provideStateInformation(java.lang.String,int,int,float,int,int,int,int,int,int,int,int,int,int,int,int,int)" doc:name="Invoke static" doc:id="d0a388f8-7ccd-4e98-91ab-d983f686f860" class="movid.StateInformation">
+			<java:args ><![CDATA[#[{state:payload.state,population:payload.population,testPositivityRatio:payload.metrics.testPositivityRatio,tpInfectionRate:payload.metrics.infectionRate,overallRiskLevel:payload.riskLevels.overall,riskLeveltestPositivityRatio:payload.riskLevels.testPositivityRatio,caseDensity:payload.riskLevels.caseDensity,contactTracerCapacityRatio:payload.riskLevels.contactTracerCapacityRatio,infectionRate:payload.riskLevels.infectionRate,icuHeadroomRatio:payload.riskLevels.icuHeadroomRatio,actualCases:payload.actuals.cases,actualDeaths:payload.actuals.deaths,actualPositiveTests:payload.actuals.positiveTests,actualNegativeTests:payload.actuals.negativeTests,actualContactTracers:payload.actuals.contactTracers,hospitalBedCapacity:payload.actuals.hospitalBeds.capacity,newCases:payload.actuals.newCases}]]]></java:args>
+		</java:invoke-static>
+		<ee:transform doc:name="Transform Message" doc:id="f3f046cf-5c71-43b4-ac4c-9793258314ee" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="StateRestrictions" doc:id="05a739d7-7ecd-4130-98cd-6327b9b9a754" >
+		<http:listener doc:name="Listener" doc:id="206fe866-ca25-40c9-ba83-dbda99b8086e" config-ref="HTTP_Listener_config" path="/api/stateRestrictions"/>
+		<set-variable value="#[attributes.queryParams.stateCode]" doc:name="Set Variable" doc:id="ea83057c-ff21-4f58-b21a-0f2d2809294b" variableName="stateCode"/>
+		<http:request method="GET" doc:name="Request" doc:id="32dd182c-8856-41d5-882a-7cec5f716813" config-ref="HTTP_Request_configuration1" path="/covid19/v1/high-level-policy">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"state" : vars.stateCode,
+	"country" : "USA"
+}]]]></http:query-params>
+		</http:request>
+		<java:invoke-static doc:name="Invoke static" doc:id="3ed6d1a6-4e1c-4450-b68d-9ce46585ab30" class="movid.StateRestrictions" method="determineStateRestrictions(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String)">
+			<java:args ><![CDATA[#[{Gathering_Restriction_Code:payload.Community_regulations.Gathering_Restriction_Code,School_Closure_Code:payload.Community_regulations.School_Closure_Code,Non_Essential_Business_Closure_Code:payload.Community_regulations.Non_Essential_Business_Closure_Code,Social_Distancing_Requirement_Code:payload.Community_regulations.Social_Distancing_Requirement_Code,Face_Covering_Policy_Code:payload.Community_regulations.Face_Covering_Policy_Code,Bar_Restrictions_Code:payload.Community_regulations.Bar_Restrictions_Code,Reopening_Plan_Code:payload.Community_regulations.Reopening_Plan_Code,Stay_at_Home_Requirement_Code:payload.Community_regulations.Stay_at_Home_Requirement_Code,Domestic_Travel_Restrictions_Code:payload.Community_regulations.Domestic_Travel_Restrictions_Code,Restaurant_Restrictions_Code:payload.Community_regulations.Restaurant_Restrictions_Code}]]]></java:args>
+		</java:invoke-static>
+		<ee:transform doc:name="Transform Message" doc:id="f933af0c-5e63-457f-ad07-18f897328d6a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="StateRiskLevelsFlow" doc:id="ef61e0c5-a321-4592-829e-d316e9d0e870" >
+		<http:listener doc:name="Listener" doc:id="06d3db3d-3639-43db-98b1-1ea833ae2730" config-ref="HTTP_Listener_config" path="/api/staterisklevels"/>
+		<set-variable value="#[attributes.queryParams.stateCode]" doc:name="Set Variable" doc:id="cf78e01f-3b8c-4047-8050-bf3a276fde3e" variableName="stateCode"/>
+		<http:request method="GET" doc:name="Request" doc:id="7131d5b2-37ee-4390-ac6e-0b4d0f64d76c" config-ref="covidactnowConfig" path='#[vars.stateCode ++ ".json"]'>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"apiKey" : "${apiKey}"
+}]]]></http:query-params>
+		</http:request>
+		<java:invoke-static method="stateRiskLevels(int,int,int,int)" doc:name="Invoke static" doc:id="4f8bf9d2-5f16-493c-beb6-15e5d58d2285" class="movid.StateRiskLevels">
+			<java:args ><![CDATA[#[{overall:payload.riskLevels.overall,infectionRate:payload.riskLevels.infectionRate,icuHeadroomRatio:payload.riskLevels.icuHeadroomRatio,testPositivityRatio:payload.riskLevels.testPositivityRatio}]]]></java:args>
+		</java:invoke-static>
+		<ee:transform doc:name="Transform Message" doc:id="d4b389ce-4947-4a1e-bed1-51af93f118c9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="RecordSymptomsFlow" doc:id="25d2435e-8806-4bb7-b641-464098dc5a8c" >
+		<http:listener doc:name="Listener" doc:id="aebe3c1d-bd4b-4813-90f0-139f726f7f7d" config-ref="HTTP_Listener_config" path="/api/logsymptoms"/>
+		<set-variable value="#[attributes.queryParams.description]" doc:name="Set Variable" doc:id="aea547f2-3207-4354-8683-371eb0e55d63" variableName="description"/>
+		<ee:transform doc:name="Transform Message" doc:id="fd62e4d7-3f90-4591-884a-b7087b6b1cf2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/incident
+---
+{
+	ns0#insert: {
+		ns0#comments: "",
+		ns0#short_description: vars.description,
+		ns0#state: "New"
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<servicenow:invoke doc:name="Invoke" doc:id="c88f6a98-80d2-4dfe-bd02-e401f25f4efb" config-ref="ServiceNow_Config" service="incident" operation="insert"/>
+		<ee:transform doc:name="Transform Message" doc:id="f961b131-273b-42bf-9f94-710efcb90615" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Symptoms have been recorded. Thank you!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="StateInfectionRateFlow" doc:id="39a6324e-a5de-445e-a970-8ee7c71d4b0f" >
+		<http:listener doc:name="Listener" doc:id="c498bc9d-d867-4770-9bfe-1fd5280b2582" config-ref="HTTP_Listener_config" path="/api/stateinfectionrate"/>
+		<set-variable value="#[attributes.queryParams.stateCode]" doc:name="Set Variable" doc:id="4c31f8dc-173a-4312-9e8c-fa34c42c70dc" variableName="stateCode"/>
+		<http:request method="GET" doc:name="Request" doc:id="0af67fdb-7ac0-46d6-8659-df560f54e2ba" config-ref="covidactnowConfig" path='#[vars.stateCode ++ ".json"]'>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"apiKey" : "${apiKey}"
+}]]]></http:query-params>
+		</http:request>
+		<java:invoke-static method="stateInfectionRate(float)" doc:name="Invoke static" doc:id="a2e5df29-529c-406b-ac02-524508a49283" class="movid.StateInfectionRate">
+			<java:args ><![CDATA[#[{infectionRate:payload.metrics.infectionRate}]]]></java:args>
+		</java:invoke-static>
+		<ee:transform doc:name="Transform Message" doc:id="e3d44ddd-b2c5-4fe6-9c68-470b7538b234" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
